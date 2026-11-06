@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#153e42">
+<title>Dental Eruption Mastery</title>
+<style>
+:root{--ink:#17383a;--teal:#176b65;--mint:#e8f4f1;--paper:#f7faf9;--line:#d8e5e1;--muted:#607572;--gold:#f2c96d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:#203433;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(135deg,#153e42,#176b65);color:white;padding:28px 18px 24px}
+.wrap{max-width:1000px;margin:auto;padding:0 16px}h1{font-size:clamp(1.7rem,4vw,2.5rem);margin:8px 0}header p{color:#d5e9e5;margin:4px 0}.tag{display:inline-block;border:1px solid #8bbab2;border-radius:99px;padding:3px 10px;font-size:.78rem}
+nav{display:flex;gap:8px;overflow-x:auto;padding:14px 0;position:sticky;top:0;background:var(--paper);z-index:2}
+nav button,.btn{border:1px solid var(--line);background:white;color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:650;cursor:pointer;white-space:nowrap}
+nav button.active,.btn.primary{background:var(--teal);color:white;border-color:var(--teal)}
+main{padding-bottom:40px}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin:8px 0 18px;box-shadow:0 3px 14px #17383a0a}
+h2{margin:0 0 6px;color:var(--ink)}h3{margin:12px 0 6px}.muted,small{color:var(--muted)}.switch{display:flex;gap:8px;margin:14px 0}.switch button{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.tooth{min-height:54px;text-align:left;border:1px solid var(--line);background:#fbfdfc;border-radius:12px;padding:10px;cursor:pointer}.tooth:hover,.tooth.selected{border-color:var(--teal);background:var(--mint)}
+.detail{margin-top:14px;padding:16px;background:var(--mint);border-radius:14px}.age{font-size:1.8rem;font-weight:800;color:var(--teal)}
+.timeline-item{display:grid;grid-template-columns:105px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.timeline-item:last-child{border:0}.timeline-age{font-weight:800;color:var(--teal)}
+.choice{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;cursor:pointer}.choice:hover{background:var(--mint)}.feedback{padding:12px;border-radius:12px;background:var(--mint);margin-top:12px}
+footer{font-size:.85rem;color:var(--muted);padding:20px 0 35px}a{color:var(--teal)}.hide{display:none!important}
+@media(min-width:700px){.panel{padding:24px}.grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="tag">DDS YEAR 1 • STUDY TOOL</span><h1>🦷 Dental Eruption Mastery</h1><p>Learn the teeth. Master the timeline. Test your knowledge.</p></div></header>
+<div class="wrap">
+<nav aria-label="Learning activities">
+<button class="active" data-tab="chart">🦷 Tooth chart</button><button data-tab="timeline">⏳ Timeline</button><button data-tab="memory">🧠 Memory game</button><button data-tab="quiz">❓ Quiz</button><button data-tab="guess">🎯 Guess my tooth</button>
+</nav>
+<main>
+<section id="chart" class="panel">
+<h2>Interactive dental chart</h2><p class="muted">Choose primary or permanent dentition, then select a tooth.</p>
+<div class="switch"><button class="btn primary" data-dent="permanent">Permanent teeth</button><button class="btn" data-dent="primary">Primary teeth</button></div>
+<div id="chartGroups"></div><div id="toothDetail" class="detail">Select a tooth to see its typical eruption age.</div>
+</section>
+<section id="timeline" class="panel hide"><h2>Eruption timeline</h2><p class="muted">Typical age ranges, arranged from earliest to latest.</p>
+<div class="switch"><button class="btn primary" data-timeline="permanent">Permanent</button><button class="btn" data-timeline="primary">Primary</button></div><div id="timelineList"></div></section>
+<section id="memory" class="panel hide"><h2>Memory matching</h2><p class="muted">Choose the correct age range for the tooth.</p><div id="memoryQuestion"></div><div id="memoryChoices"></div><div id="memoryFeedback" aria-live="polite"></div><button class="btn primary" id="newMemory">New question</button></section>
+<section id="quiz" class="panel hide"><h2>Knowledge quiz</h2><p class="muted">One question at a time, with instant feedback.</p><div id="quizArea"></div><p><strong>Score: <span id="score">0</span></strong></p><button class="btn primary" id="nextQuiz">Next question</button></section>
+<section id="guess" class="panel hide"><h2>Guess my tooth</h2><p class="muted">Use the eruption clues to identify the tooth.</p><div id="guessArea"></div><button class="btn primary" id="newGuess">New mystery</button></section>
+</main>
+<footer><strong>Study note:</strong> Eruption ages are approximate population ranges, not exact deadlines. Individual variation occurs. This educational resource is not a diagnostic tool. Always follow your course's prescribed reference and local teaching chart.<br><br><strong>Reference basis:</strong> American Dental Association (ADA), MouthHealthy tooth eruption charts; American Academy of Pediatric Dentistry (AAPD), reference materials on developing dentition; standard dental anatomy and pediatric dentistry eruption tables. Ranges may differ slightly between references.</footer>
+</div>
+<script>
+const teeth=[
+{d:'permanent',jaw:'Maxillary',name:'Central incisor',age:'7–8 years',short:'Maxillary central incisor',order:7},
+{d:'permanent',jaw:'Maxillary',name:'Lateral incisor',age:'8–9 years',short:'Maxillary lateral incisor',order:8},
+{d:'permanent',jaw:'Maxillary',name:'Canine',age:'11–12 years',short:'Maxillary canine',order:11},
+{d:'permanent',jaw:'Maxillary',name:'First premolar',age:'10–11 years',short:'Maxillary first premolar',order:10},
+{d:'permanent',jaw:'Maxillary',name:'Second premolar',age:'10–12 years',short:'Maxillary second premolar',order:10.5},
+{d:'permanent',jaw:'Maxillary',name:'First molar',age:'6–7 years',short:'Maxillary first molar',order:6},
+{d:'permanent',jaw:'Maxillary',name:'Second molar',age:'12–13 years',short:'Maxillary second molar',order:12},
+{d:'permanent',jaw:'Maxillary',name:'Third molar',age:'17–21 years',short:'Maxillary third molar',order:17},
+{d:'permanent',jaw:'Mandibular',name:'Central incisor',age:'6–7 years',short:'Mandibular central incisor',order:6},
+{d:'permanent',jaw:'Mandibular',name:'Lateral incisor',age:'7–8 years',short:'Mandibular lateral incisor',order:7},
+{d:'permanent',jaw:'Mandibular',name:'Canine',age:'9–10 years',short:'Mandibular canine',order:9},
+{d:'permanent',jaw:'Mandibular',name:'First premolar',age:'10–12 years',short:'Mandibular first premolar',order:10},
+{d:'permanent',jaw:'Mandibular',name:'Second premolar',age:'11–12 years',short:'Mandibular second premolar',order:11},
+{d:'permanent',jaw:'Mandibular',name:'First molar',age:'6–7 years',short:'Mandibular first molar',order:6},
+{d:'permanent',jaw:'Mandibular',name:'Second molar',age:'11–13 years',short:'Mandibular second molar',order:11},
+{d:'permanent',jaw:'Mandibular',name:'Third molar',age:'17–21 years',short:'Mandibular third molar',order:17},
+{d:'primary',jaw:'Maxillary',name:'Central incisor',age:'8–12 months',short:'Maxillary primary central incisor',order:8},
+{d:'primary',jaw:'Maxillary',name:'Lateral incisor',age:'9–13 months',short:'Maxillary primary lateral incisor',order:9},
+{d:'primary',jaw:'Maxillary',name:'Canine',age:'16–22 months',short:'Maxillary primary canine',order:16},
+{d:'primary',jaw:'Maxillary',name:'First molar',age:'13–19 months',short:'Maxillary primary first molar',order:13},
+{d:'primary',jaw:'Maxillary',name:'Second molar',age:'25–33 months',short:'Maxillary primary second molar',order:25},
+{d:'primary',jaw:'Mandibular',name:'Central incisor',age:'6–10 months',short:'Mandibular primary central incisor',order:6},
+{d:'primary',jaw:'Mandibular',name:'Lateral incisor',age:'10–16 months',short:'Mandibular primary lateral incisor',order:10},
+{d:'primary',jaw:'Mandibular',name:'Canine',age:'17–23 months',short:'Mandibular primary canine',order:17},
+{d:'primary',jaw:'Mandibular',name:'First molar',age:'14–18 months',short:'Mandibular primary first molar',order:14},
+{d:'primary',jaw:'Mandibular',name:'Second molar',age:'23–31 months',short:'Mandibular primary second molar',order:23}
+];
+let dent='permanent',selected=null,score=0,quizAnswered=false,memoryCurrent=null,guessCurrent=null;
+const $=id=>document.getElementById(id);
+function switchTab(tab){document.querySelectorAll('main section').forEach(s=>s.classList.toggle('hide',s.id!==tab));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+function setDent(d){dent=d;document.querySelectorAll('[data-dent]').forEach(b=>b.classList.toggle('primary',b.dataset.dent===d));renderChart();}
+document.querySelectorAll('[data-dent]').forEach(b=>b.addEventListener('click',()=>setDent(b.dataset.dent)));
+function renderChart(){const list=teeth.filter(t=>t.d===dent);$('chartGroups').innerHTML=['Maxillary','Mandibular'].map(j=>`<h3>${j} teeth</h3><div class="grid">${list.filter(t=>t.jaw===j).map(t=>`<button class="tooth ${selected===t.short?'selected':''}" data-tooth="${t.short}">${t.name}</button>`).join('')}</div>`).join('');document.querySelectorAll('[data-tooth]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.tooth;const t=teeth.find(x=>x.short===selected);$('toothDetail').innerHTML=`<strong>${t.jaw} ${t.name}</strong><div class="age">${t.age}</div><small>Typical eruption age • ${dent==='primary'?'Primary':'Permanent'} dentition</small>`;renderChart();}));}
+function renderTimeline(d){const list=teeth.filter(t=>t.d===d).sort((a,b)=>a.order-b.order);$('timelineList').innerHTML=list.map(t=>`<div class="timeline-item"><div class="timeline-age">${t.age}</div><div>${t.jaw} ${t.name}</div></div>`).join('');}
+document.querySelectorAll('[data-timeline]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-timeline]').forEach(x=>x.classList.toggle('primary',x===b));renderTimeline(b.dataset.timeline)}));
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function newMemory(){const pool=teeth.filter(t=>t.d==='permanent');memoryCurrent=pool[Math.floor(Math.random()*pool.length)];$('memoryQuestion').innerHTML=`<h3>What is the eruption age of the ${memoryCurrent.jaw.toLowerCase()} ${memoryCurrent.name.toLowerCase()}?</h3>`;$('memoryFeedback').innerHTML='';$('memoryChoices').innerHTML=shuffle([memoryCurrent.age,...shuffle(pool.filter(t=>t.age!==memoryCurrent.age).map(t=>t.age)).slice(0,3)]).map(a=>`<button class="choice" data-age="${a}">${a}</button>`).join('');document.querySelectorAll('[data-age]').forEach(b=>b.addEventListener('click',()=>{$('memoryFeedback').innerHTML=`<div class="feedback">${b.dataset.age===memoryCurrent.age?'Correct! 🎉':'Not quite.'} Correct answer: <strong>${memoryCurrent.age}</strong>.</div>`;document.querySelectorAll('[data-age]').forEach(x=>x.disabled=true)}));}
+$('newMemory').addEventListener('click',newMemory);
+const questions=[
+{q:'Which permanent tooth is commonly called the 6-year molar?',a:['First molar','Second molar','First premolar','Third molar'],c:0,why:'The first permanent molar usually erupts around 6–7 years and does not replace a primary tooth.'},
+{q:'Which permanent teeth generally erupt first?',a:['Canines','First molars and mandibular central incisors','Second molars','Premolars'],c:1,why:'The first permanent molars and mandibular central incisors are among the earliest permanent teeth.'},
+{q:'Which teeth replace primary molars?',a:['Permanent molars','Premolars','Canines','Central incisors'],c:1,why:'Permanent premolars succeed the primary first and second molars.'},
+{q:'Which primary teeth usually erupt first?',a:['Maxillary canines','Mandibular central incisors','Second molars','Maxillary lateral incisors'],c:1,why:'Mandibular primary central incisors are typically the first primary teeth to erupt.'}
+];let qIndex=0;
+function renderQuiz(){quizAnswered=false;const q=questions[qIndex];$('quizArea').innerHTML=`<p><strong>Question ${qIndex+1} of ${questions.length}</strong></p><h3>${q.q}</h3>${q.a.map((a,i)=>`<button class="choice" data-q="${i}">${a}</button>`).join('')}<div id="quizFeedback" aria-live="polite"></div>`;document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{if(quizAnswered)return;quizAnswered=true;const correct=Number(b.dataset.q)===q.c;if(correct){score++;$('score').textContent=score;}document.querySelectorAll('[data-q]').forEach(x=>x.disabled=true);$('quizFeedback').innerHTML=`<div class="feedback">${correct?'Correct! 🎉':'Not quite.'} ${q.why}</div>`;}));}
+$('nextQuiz').addEventListener('click',()=>{qIndex=(qIndex+1)%questions.length;renderQuiz()});
+function newGuess(){const pool=teeth.filter(t=>t.d==='permanent'&&t.jaw==='Mandibular');guessCurrent=pool[Math.floor(Math.random()*pool.length)];const clues={ 'Central incisor':'I sit at the midline of the lower jaw.','Lateral incisor':'I sit next to the lower central incisor.','Canine':'I am between the lateral incisor and first premolar.','First premolar':'I am the first premolar behind the canine.','Second premolar':'I sit behind the first premolar.','First molar':'I am a 6-year molar.','Second molar':'I erupt after the first permanent molar.','Third molar':'I am commonly called the wisdom tooth.'};$('guessArea').innerHTML=`<p><strong>Clue 1:</strong> I am a mandibular permanent tooth.</p><p><strong>Clue 2:</strong> I erupt around <b>${guessCurrent.age}</b>.</p><p><strong>Clue 3:</strong> ${clues[guessCurrent.name]}</p><div id="guessOptions">${shuffle(pool).map(t=>`<button class="choice" data-guess="${t.name}">${t.name}</button>`).join('')}</div><div id="guessFeedback" aria-live="polite"></div>`;document.querySelectorAll('[data-guess]').forEach(b=>b.addEventListener('click',()=>{$('guessFeedback').innerHTML=`<div class="feedback">${b.dataset.guess===guessCurrent.name?'Correct! 🎯':'Good try.'} The answer is <strong>mandibular ${guessCurrent.name.toLowerCase()}</strong> (${guessCurrent.age}).</div>`;document.querySelectorAll('[data-guess]').forEach(x=>x.disabled=true)}));}
+$('newGuess').addEventListener('click',newGuess);
+renderChart();renderTimeline('permanent');newMemory();renderQuiz();newGuess();
+</script>
+</body></html>
